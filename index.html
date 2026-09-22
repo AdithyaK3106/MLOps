@@ -1,19 +1,438 @@
+
+
 <!DOCTYPE html>
-<html>
-<head><title>Text File</title></head>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dodge the Blocks</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background:
+            radial-gradient(circle at top, #243b72, #0b1020 55%, #050711);
+        font-family: Arial, sans-serif;
+        color: white;
+        overflow: hidden;
+    }
+
+    .game-wrapper {
+        width: min(92vw, 430px);
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 2rem;
+        margin-bottom: 8px;
+        letter-spacing: 1px;
+    }
+
+    .subtitle {
+        color: #9da9c7;
+        margin-bottom: 18px;
+        font-size: 0.9rem;
+    }
+
+    .game {
+        position: relative;
+        width: 100%;
+        height: min(70vh, 620px);
+        min-height: 500px;
+        border: 2px solid rgba(255,255,255,.15);
+        border-radius: 20px;
+        overflow: hidden;
+        background: linear-gradient(#111936, #080c19);
+        box-shadow: 0 25px 70px rgba(0,0,0,.5);
+    }
+
+    .stars {
+        position: absolute;
+        inset: 0;
+        background-image:
+            radial-gradient(circle, rgba(255,255,255,.8) 1px, transparent 1px),
+            radial-gradient(circle, rgba(255,255,255,.45) 1px, transparent 1px);
+        background-size: 65px 65px, 95px 95px;
+        background-position: 10px 20px, 40px 50px;
+        opacity: .35;
+    }
+
+    .hud {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        right: 15px;
+        display: flex;
+        justify-content: space-between;
+        z-index: 10;
+        font-weight: bold;
+        font-size: 1rem;
+    }
+
+    .hud span {
+        background: rgba(0,0,0,.35);
+        padding: 8px 12px;
+        border-radius: 10px;
+        backdrop-filter: blur(5px);
+    }
+
+    #player {
+        position: absolute;
+        width: 42px;
+        height: 42px;
+        bottom: 25px;
+        left: calc(50% - 21px);
+        border-radius: 10px;
+        background: linear-gradient(135deg, #5ee7ff, #2878ff);
+        box-shadow:
+            0 0 15px #319cff,
+            0 0 35px rgba(49,156,255,.5);
+        z-index: 5;
+    }
+
+    #player::after {
+        content: "";
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        background: white;
+        border-radius: 50%;
+        top: 9px;
+        left: 15px;
+        opacity: .8;
+    }
+
+    .enemy {
+        position: absolute;
+        width: 38px;
+        height: 38px;
+        border-radius: 9px;
+        background: linear-gradient(135deg, #ff5f6d, #ff1744);
+        box-shadow: 0 0 20px rgba(255,40,70,.55);
+        z-index: 4;
+    }
+
+    .overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background: rgba(4,7,18,.78);
+        backdrop-filter: blur(6px);
+        z-index: 20;
+        padding: 30px;
+    }
+
+    .overlay h2 {
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+    }
+
+    .overlay p {
+        color: #aeb8d3;
+        margin-bottom: 25px;
+        line-height: 1.5;
+    }
+
+    button {
+        border: none;
+        padding: 13px 28px;
+        border-radius: 12px;
+        color: white;
+        font-weight: bold;
+        font-size: 1rem;
+        cursor: pointer;
+        background: linear-gradient(135deg, #2878ff, #7048ff);
+        box-shadow: 0 8px 25px rgba(55,100,255,.35);
+        transition: .2s;
+    }
+
+    button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(55,100,255,.5);
+    }
+
+    .controls {
+        margin-top: 15px;
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .control {
+        width: 90px;
+        padding: 12px;
+        background: rgba(255,255,255,.08);
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 12px;
+        user-select: none;
+        touch-action: none;
+    }
+
+    .control:active {
+        background: rgba(255,255,255,.18);
+        transform: scale(.96);
+    }
+
+    @media (min-width: 700px) {
+        .controls {
+            display: none;
+        }
+    }
+</style>
+</head>
+
 <body>
-<h2>Create TXT File</h2>
-<button onclick="download()">Download</button>
+
+<div class="game-wrapper">
+    <h1>⚡ Dodge the Blocks</h1>
+    <div class="subtitle">Use ← → or the buttons to survive!</div>
+
+    <div class="game" id="game">
+        <div class="stars"></div>
+
+        <div class="hud">
+            <span>Score: <b id="score">0</b></span>
+            <span>Best: <b id="best">0</b></span>
+        </div>
+
+        <div id="player"></div>
+
+        <div class="overlay" id="overlay">
+            <h2>Ready?</h2>
+            <p>Dodge the falling red blocks.<br>How long can you survive?</p>
+            <button id="startBtn">Start Game</button>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="control" id="leftBtn">◀ LEFT</div>
+        <div class="control" id="rightBtn">RIGHT ▶</div>
+    </div>
+</div>
+
 <script>
-function download() {
-let text = "Hello!\nThis is my text file.\nWelcome to GitHub!\n thank you";
-let file = new Blob([text], {type:"text/plain"});
-let link = document.createElement("a");
-link.href = URL.createObjectURL(file);
-link.download = "myfile.txt";
-link.click();
+const game = document.getElementById("game");
+const player = document.getElementById("player");
+const scoreEl = document.getElementById("score");
+const bestEl = document.getElementById("best");
+const overlay = document.getElementById("overlay");
+const startBtn = document.getElementById("startBtn");
+
+let playerX = 0;
+let enemies = [];
+let score = 0;
+let best = Number(localStorage.getItem("dodgeBest")) || 0;
+let running = false;
+let lastTime = 0;
+let spawnTimer = 0;
+let speed = 180;
+let animation;
+
+bestEl.textContent = best;
+
+function resetGame() {
+    enemies.forEach(e => e.el.remove());
+    enemies = [];
+
+    score = 0;
+    speed = 180;
+    spawnTimer = 0;
+    scoreEl.textContent = "0";
+
+    playerX = (game.clientWidth - player.offsetWidth) / 2;
+    player.style.left = playerX + "px";
 }
+
+function startGame() {
+    resetGame();
+    overlay.style.display = "none";
+    running = true;
+    lastTime = performance.now();
+    animation = requestAnimationFrame(gameLoop);
+}
+
+function endGame() {
+    running = false;
+    cancelAnimationFrame(animation);
+
+    if (score > best) {
+        best = score;
+        localStorage.setItem("dodgeBest", best);
+        bestEl.textContent = best;
+    }
+
+    overlay.innerHTML = `
+        <h2>Game Over 💥</h2>
+        <p>You scored <strong>${score}</strong> points!</p>
+        <button id="startBtn">Play Again</button>
+    `;
+
+    overlay.style.display = "flex";
+    document.getElementById("startBtn").onclick = startGame;
+}
+
+function spawnEnemy() {
+    const el = document.createElement("div");
+    el.className = "enemy";
+
+    const maxX = game.clientWidth - 38;
+    const x = Math.random() * maxX;
+
+    el.style.left = x + "px";
+    el.style.top = "-50px";
+
+    game.appendChild(el);
+
+    enemies.push({
+        el,
+        x,
+        y: -50,
+        speed: speed + Math.random() * 100
+    });
+}
+
+function collision(a, b) {
+    return (
+        a.x < b.x + b.width &&
+        a.x + a.width > b.x &&
+        a.y < b.y + b.height &&
+        a.y + a.height > b.y
+    );
+}
+
+function gameLoop(time) {
+    if (!running) return;
+
+    const delta = (time - lastTime) / 1000;
+    lastTime = time;
+
+    // Move player
+    if (keys.left) playerX -= 300 * delta;
+    if (keys.right) playerX += 300 * delta;
+
+    playerX = Math.max(
+        0,
+        Math.min(game.clientWidth - player.offsetWidth, playerX)
+    );
+
+    player.style.left = playerX + "px";
+
+    // Spawn enemies
+    spawnTimer += delta;
+
+    const spawnRate = Math.max(.28, .75 - score / 500);
+
+    if (spawnTimer > spawnRate) {
+        spawnEnemy();
+        spawnTimer = 0;
+    }
+
+    const playerRect = {
+        x: playerX,
+        y: game.clientHeight - 25 - player.offsetHeight,
+        width: player.offsetWidth,
+        height: player.offsetHeight
+    };
+
+    // Move enemies
+    for (let i = enemies.length - 1; i >= 0; i--) {
+        const enemy = enemies[i];
+
+        enemy.y += enemy.speed * delta;
+        enemy.el.style.top = enemy.y + "px";
+
+        const enemyRect = {
+            x: enemy.x,
+            y: enemy.y,
+            width: 38,
+            height: 38
+        };
+
+        if (collision(playerRect, enemyRect)) {
+            endGame();
+            return;
+        }
+
+        if (enemy.y > game.clientHeight) {
+            enemy.el.remove();
+            enemies.splice(i, 1);
+
+            score++;
+            scoreEl.textContent = score;
+
+            if (score % 10 === 0) {
+                speed += 15;
+            }
+        }
+    }
+
+    animation = requestAnimationFrame(gameLoop);
+}
+
+const keys = {
+    left: false,
+    right: false
+};
+
+document.addEventListener("keydown", e => {
+    if (e.key === "ArrowLeft" || e.key.toLowerCase() === "a") {
+        keys.left = true;
+    }
+
+    if (e.key === "ArrowRight" || e.key.toLowerCase() === "d") {
+        keys.right = true;
+    }
+
+    if (e.key === " " && !running) {
+        startGame();
+    }
+});
+
+document.addEventListener("keyup", e => {
+    if (e.key === "ArrowLeft" || e.key.toLowerCase() === "a") {
+        keys.left = false;
+    }
+
+    if (e.key === "ArrowRight" || e.key.toLowerCase() === "d") {
+        keys.right = false;
+    }
+});
+
+// Mobile controls
+function holdButton(button, direction) {
+    const start = e => {
+        e.preventDefault();
+        keys[direction] = true;
+    };
+
+    const stop = e => {
+        e.preventDefault();
+        keys[direction] = false;
+    };
+
+    button.addEventListener("pointerdown", start);
+    button.addEventListener("pointerup", stop);
+    button.addEventListener("pointerleave", stop);
+    button.addEventListener("pointercancel", stop);
+}
+
+holdButton(document.getElementById("leftBtn"), "left");
+holdButton(document.getElementById("rightBtn"), "right");
+
+startBtn.onclick = startGame;
 </script>
+
 </body>
 </html>
-
