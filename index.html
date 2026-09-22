@@ -4,434 +4,1235 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dodge the Blocks</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Dodge the Blocks — Deluxe</title>
 
 <style>
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
+*{box-sizing:border-box;margin:0;padding:0}
 
-    body {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background:
-            radial-gradient(circle at top, #243b72, #0b1020 55%, #050711);
-        font-family: Arial, sans-serif;
-        color: white;
-        overflow: hidden;
-    }
+body{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+        radial-gradient(circle at 50% 0%,#263b7c 0,#111832 35%,#050711 75%);
+    color:white;
+    font-family:Arial,sans-serif;
+    overflow:hidden;
+}
 
-    .game-wrapper {
-        width: min(92vw, 430px);
-        text-align: center;
-    }
+.wrapper{
+    width:min(94vw,460px);
+    text-align:center;
+}
 
-    h1 {
-        font-size: 2rem;
-        margin-bottom: 8px;
-        letter-spacing: 1px;
-    }
+h1{
+    font-size:clamp(1.6rem,5vw,2.2rem);
+    margin-bottom:5px;
+    letter-spacing:1px;
+}
 
-    .subtitle {
-        color: #9da9c7;
-        margin-bottom: 18px;
-        font-size: 0.9rem;
-    }
+.subtitle{
+    color:#9ca9cb;
+    font-size:.85rem;
+    margin-bottom:14px;
+}
 
-    .game {
-        position: relative;
-        width: 100%;
-        height: min(70vh, 620px);
-        min-height: 500px;
-        border: 2px solid rgba(255,255,255,.15);
-        border-radius: 20px;
-        overflow: hidden;
-        background: linear-gradient(#111936, #080c19);
-        box-shadow: 0 25px 70px rgba(0,0,0,.5);
-    }
+.game{
+    position:relative;
+    height:min(76vh,650px);
+    min-height:500px;
+    overflow:hidden;
+    border-radius:22px;
+    border:1px solid rgba(255,255,255,.18);
+    background:
+        linear-gradient(#101936,#080b18);
+    box-shadow:
+        0 30px 80px rgba(0,0,0,.55),
+        inset 0 0 60px rgba(70,100,255,.06);
+}
 
-    .stars {
-        position: absolute;
-        inset: 0;
-        background-image:
-            radial-gradient(circle, rgba(255,255,255,.8) 1px, transparent 1px),
-            radial-gradient(circle, rgba(255,255,255,.45) 1px, transparent 1px);
-        background-size: 65px 65px, 95px 95px;
-        background-position: 10px 20px, 40px 50px;
-        opacity: .35;
-    }
+.stars{
+    position:absolute;
+    inset:0;
+    background-image:
+        radial-gradient(circle,rgba(255,255,255,.8) 1px,transparent 1px),
+        radial-gradient(circle,rgba(255,255,255,.4) 1px,transparent 1px);
+    background-size:65px 65px,97px 97px;
+    animation:stars 12s linear infinite;
+    opacity:.35;
+}
 
-    .hud {
-        position: absolute;
-        top: 15px;
-        left: 15px;
-        right: 15px;
-        display: flex;
-        justify-content: space-between;
-        z-index: 10;
-        font-weight: bold;
-        font-size: 1rem;
-    }
+@keyframes stars{
+    from{background-position:0 0,20px 30px}
+    to{background-position:0 500px,20px 530px}
+}
 
-    .hud span {
-        background: rgba(0,0,0,.35);
-        padding: 8px 12px;
-        border-radius: 10px;
-        backdrop-filter: blur(5px);
-    }
+.hud{
+    position:absolute;
+    top:12px;
+    left:12px;
+    right:12px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:7px;
+    z-index:10;
+}
 
-    #player {
-        position: absolute;
-        width: 42px;
-        height: 42px;
-        bottom: 25px;
-        left: calc(50% - 21px);
-        border-radius: 10px;
-        background: linear-gradient(135deg, #5ee7ff, #2878ff);
-        box-shadow:
-            0 0 15px #319cff,
-            0 0 35px rgba(49,156,255,.5);
-        z-index: 5;
-    }
+.stat{
+    padding:8px 4px;
+    border-radius:10px;
+    background:rgba(0,0,0,.35);
+    border:1px solid rgba(255,255,255,.08);
+    backdrop-filter:blur(8px);
+    font-size:.72rem;
+    color:#aeb9d7;
+}
 
-    #player::after {
-        content: "";
-        position: absolute;
-        width: 12px;
-        height: 12px;
-        background: white;
-        border-radius: 50%;
-        top: 9px;
-        left: 15px;
-        opacity: .8;
-    }
+.stat b{
+    display:block;
+    color:white;
+    font-size:1rem;
+    margin-top:2px;
+}
 
-    .enemy {
-        position: absolute;
-        width: 38px;
-        height: 38px;
-        border-radius: 9px;
-        background: linear-gradient(135deg, #ff5f6d, #ff1744);
-        box-shadow: 0 0 20px rgba(255,40,70,.55);
-        z-index: 4;
-    }
+#player{
+    position:absolute;
+    width:43px;
+    height:43px;
+    bottom:25px;
+    left:50%;
+    border-radius:11px;
+    background:linear-gradient(135deg,#6ff4ff,#2878ff);
+    box-shadow:
+        0 0 15px #3ab1ff,
+        0 0 40px rgba(30,130,255,.5);
+    z-index:5;
+    transition:box-shadow .2s;
+}
 
-    .overlay {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        background: rgba(4,7,18,.78);
-        backdrop-filter: blur(6px);
-        z-index: 20;
-        padding: 30px;
-    }
+#player::before{
+    content:"";
+    position:absolute;
+    width:13px;
+    height:13px;
+    left:15px;
+    top:8px;
+    background:white;
+    border-radius:50%;
+    opacity:.85;
+}
 
-    .overlay h2 {
-        font-size: 2.2rem;
-        margin-bottom: 10px;
-    }
+#player.shield{
+    box-shadow:
+        0 0 0 5px rgba(75,220,255,.25),
+        0 0 0 9px rgba(75,220,255,.12),
+        0 0 30px #36d9ff;
+}
 
-    .overlay p {
-        color: #aeb8d3;
-        margin-bottom: 25px;
-        line-height: 1.5;
-    }
+#player.invincible{
+    animation:blink .15s infinite alternate;
+}
 
-    button {
-        border: none;
-        padding: 13px 28px;
-        border-radius: 12px;
-        color: white;
-        font-weight: bold;
-        font-size: 1rem;
-        cursor: pointer;
-        background: linear-gradient(135deg, #2878ff, #7048ff);
-        box-shadow: 0 8px 25px rgba(55,100,255,.35);
-        transition: .2s;
-    }
+@keyframes blink{
+    from{opacity:.35}
+    to{opacity:1}
+}
 
-    button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 12px 30px rgba(55,100,255,.5);
-    }
+.enemy{
+    position:absolute;
+    width:38px;
+    height:38px;
+    border-radius:9px;
+    background:linear-gradient(135deg,#ff6675,#ff1744);
+    box-shadow:0 0 20px rgba(255,40,70,.55);
+    z-index:4;
+}
 
-    .controls {
-        margin-top: 15px;
-        display: flex;
-        gap: 12px;
-        justify-content: center;
-    }
+.enemy.fast{
+    background:linear-gradient(135deg,#ffb52e,#ff4d00);
+}
 
-    .control {
-        width: 90px;
-        padding: 12px;
-        background: rgba(255,255,255,.08);
-        border: 1px solid rgba(255,255,255,.1);
-        border-radius: 12px;
-        user-select: none;
-        touch-action: none;
-    }
+.enemy.big{
+    width:52px;
+    height:52px;
+    border-radius:13px;
+    background:linear-gradient(135deg,#bc55ff,#7025e8);
+}
 
-    .control:active {
-        background: rgba(255,255,255,.18);
-        transform: scale(.96);
-    }
+.coin{
+    position:absolute;
+    width:25px;
+    height:25px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#fff36b,#ffb300);
+    border:2px solid #fff8a3;
+    box-shadow:0 0 18px #ffc400;
+    z-index:4;
+    animation:spin .7s linear infinite;
+}
 
-    @media (min-width: 700px) {
-        .controls {
-            display: none;
-        }
-    }
+@keyframes spin{
+    0%{transform:rotateY(0)}
+    100%{transform:rotateY(360deg)}
+}
+
+.power{
+    position:absolute;
+    width:30px;
+    height:30px;
+    border-radius:8px;
+    z-index:4;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:16px;
+    font-weight:bold;
+    animation:pulse .7s infinite alternate;
+}
+
+@keyframes pulse{
+    to{transform:scale(1.15)}
+}
+
+.power.shield{
+    background:#25d9ff;
+    box-shadow:0 0 22px #25d9ff;
+}
+
+.power.slow{
+    background:#a45cff;
+    box-shadow:0 0 22px #a45cff;
+}
+
+.power.life{
+    background:#ff4d73;
+    box-shadow:0 0 22px #ff4d73;
+}
+
+.particle{
+    position:absolute;
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    pointer-events:none;
+    z-index:15;
+}
+
+.overlay{
+    position:absolute;
+    inset:0;
+    z-index:30;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:30px;
+    text-align:center;
+    background:rgba(3,6,18,.8);
+    backdrop-filter:blur(8px);
+}
+
+.overlay h2{
+    font-size:2.3rem;
+    margin-bottom:10px;
+}
+
+.overlay p{
+    color:#aab5d0;
+    line-height:1.6;
+    margin-bottom:23px;
+}
+
+button{
+    border:0;
+    color:white;
+    font-weight:bold;
+    font-size:1rem;
+    padding:13px 28px;
+    border-radius:12px;
+    cursor:pointer;
+    background:linear-gradient(135deg,#2878ff,#7447ff);
+    box-shadow:0 10px 28px rgba(65,90,255,.4);
+    transition:.2s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+}
+
+.pause{
+    position:absolute;
+    right:12px;
+    bottom:12px;
+    z-index:20;
+    width:42px;
+    height:42px;
+    padding:0;
+    border-radius:12px;
+    background:rgba(255,255,255,.1);
+    border:1px solid rgba(255,255,255,.15);
+    backdrop-filter:blur(8px);
+}
+
+.controls{
+    margin-top:12px;
+    display:flex;
+    justify-content:center;
+    gap:12px;
+}
+
+.control{
+    width:105px;
+    padding:12px;
+    border-radius:12px;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.1);
+    user-select:none;
+    touch-action:none;
+}
+
+.control:active{
+    transform:scale(.95);
+    background:rgba(255,255,255,.18);
+}
+
+.tip{
+    margin-top:10px;
+    color:#687493;
+    font-size:.7rem;
+}
+
+@media(min-width:700px){
+    .controls{display:none}
+}
 </style>
 </head>
 
 <body>
 
-<div class="game-wrapper">
+<div class="wrapper">
+
     <h1>⚡ Dodge the Blocks</h1>
-    <div class="subtitle">Use ← → or the buttons to survive!</div>
+    <div class="subtitle">Survive • Collect • Power Up • Beat Your Record</div>
 
     <div class="game" id="game">
+
         <div class="stars"></div>
 
         <div class="hud">
-            <span>Score: <b id="score">0</b></span>
-            <span>Best: <b id="best">0</b></span>
+            <div class="stat">
+                SCORE
+                <b id="score">0</b>
+            </div>
+
+            <div class="stat">
+                LEVEL
+                <b id="level">1</b>
+            </div>
+
+            <div class="stat">
+                ❤️ LIVES
+                <b id="lives">3</b>
+            </div>
+
+            <div class="stat">
+                🪙 COINS
+                <b id="coins">0</b>
+            </div>
+
+            <div class="stat">
+                🔥 COMBO
+                <b id="combo">x1</b>
+            </div>
+
+            <div class="stat">
+                🏆 BEST
+                <b id="best">0</b>
+            </div>
         </div>
 
         <div id="player"></div>
 
+        <button class="pause" id="pauseBtn">Ⅱ</button>
+
         <div class="overlay" id="overlay">
-            <h2>Ready?</h2>
-            <p>Dodge the falling red blocks.<br>How long can you survive?</p>
+            <h2>🚀 Ready?</h2>
+            <p>
+                Dodge the red blocks.<br>
+                Collect coins and grab power-ups.<br>
+                Survive as long as possible!
+            </p>
             <button id="startBtn">Start Game</button>
         </div>
+
     </div>
 
     <div class="controls">
         <div class="control" id="leftBtn">◀ LEFT</div>
         <div class="control" id="rightBtn">RIGHT ▶</div>
     </div>
+
+    <div class="tip">Keyboard: ← → / A D &nbsp; • &nbsp; Space: Pause</div>
+
 </div>
 
 <script>
+/* =========================
+   GAME STATE
+========================= */
+
 const game = document.getElementById("game");
 const player = document.getElementById("player");
+
 const scoreEl = document.getElementById("score");
+const levelEl = document.getElementById("level");
+const livesEl = document.getElementById("lives");
+const coinsEl = document.getElementById("coins");
+const comboEl = document.getElementById("combo");
 const bestEl = document.getElementById("best");
+
 const overlay = document.getElementById("overlay");
 const startBtn = document.getElementById("startBtn");
+const pauseBtn = document.getElementById("pauseBtn");
+
+let running = false;
+let paused = false;
+
+let animation;
+let lastTime = 0;
 
 let playerX = 0;
+
 let enemies = [];
+let coinObjects = [];
+let powerObjects = [];
+let particles = [];
+
 let score = 0;
-let best = Number(localStorage.getItem("dodgeBest")) || 0;
-let running = false;
-let lastTime = 0;
-let spawnTimer = 0;
+let coins = 0;
+let lives = 3;
+let level = 1;
+let combo = 1;
+
 let speed = 180;
-let animation;
+
+let enemyTimer = 0;
+let coinTimer = 0;
+let powerTimer = 0;
+
+let shield = false;
+let slowTime = 0;
+let invincibleTime = 0;
+
+let best = Number(localStorage.getItem("dodgeBest")) || 0;
 
 bestEl.textContent = best;
 
-function resetGame() {
-    enemies.forEach(e => e.el.remove());
-    enemies = [];
 
-    score = 0;
-    speed = 180;
-    spawnTimer = 0;
-    scoreEl.textContent = "0";
+/* =========================
+   AUDIO
+========================= */
 
-    playerX = (game.clientWidth - player.offsetWidth) / 2;
-    player.style.left = playerX + "px";
-}
+let audioCtx;
 
-function startGame() {
-    resetGame();
-    overlay.style.display = "none";
-    running = true;
-    lastTime = performance.now();
-    animation = requestAnimationFrame(gameLoop);
-}
+function sound(type){
 
-function endGame() {
-    running = false;
-    cancelAnimationFrame(animation);
-
-    if (score > best) {
-        best = score;
-        localStorage.setItem("dodgeBest", best);
-        bestEl.textContent = best;
-    }
-
-    overlay.innerHTML = `
-        <h2>Game Over 💥</h2>
-        <p>You scored <strong>${score}</strong> points!</p>
-        <button id="startBtn">Play Again</button>
-    `;
-
-    overlay.style.display = "flex";
-    document.getElementById("startBtn").onclick = startGame;
-}
-
-function spawnEnemy() {
-    const el = document.createElement("div");
-    el.className = "enemy";
-
-    const maxX = game.clientWidth - 38;
-    const x = Math.random() * maxX;
-
-    el.style.left = x + "px";
-    el.style.top = "-50px";
-
-    game.appendChild(el);
-
-    enemies.push({
-        el,
-        x,
-        y: -50,
-        speed: speed + Math.random() * 100
-    });
-}
-
-function collision(a, b) {
-    return (
-        a.x < b.x + b.width &&
-        a.x + a.width > b.x &&
-        a.y < b.y + b.height &&
-        a.y + a.height > b.y
-    );
-}
-
-function gameLoop(time) {
-    if (!running) return;
-
-    const delta = (time - lastTime) / 1000;
-    lastTime = time;
-
-    // Move player
-    if (keys.left) playerX -= 300 * delta;
-    if (keys.right) playerX += 300 * delta;
-
-    playerX = Math.max(
-        0,
-        Math.min(game.clientWidth - player.offsetWidth, playerX)
-    );
-
-    player.style.left = playerX + "px";
-
-    // Spawn enemies
-    spawnTimer += delta;
-
-    const spawnRate = Math.max(.28, .75 - score / 500);
-
-    if (spawnTimer > spawnRate) {
-        spawnEnemy();
-        spawnTimer = 0;
-    }
-
-    const playerRect = {
-        x: playerX,
-        y: game.clientHeight - 25 - player.offsetHeight,
-        width: player.offsetWidth,
-        height: player.offsetHeight
-    };
-
-    // Move enemies
-    for (let i = enemies.length - 1; i >= 0; i--) {
-        const enemy = enemies[i];
-
-        enemy.y += enemy.speed * delta;
-        enemy.el.style.top = enemy.y + "px";
-
-        const enemyRect = {
-            x: enemy.x,
-            y: enemy.y,
-            width: 38,
-            height: 38
-        };
-
-        if (collision(playerRect, enemyRect)) {
-            endGame();
-            return;
+    try{
+        if(!audioCtx){
+            audioCtx = new (window.AudioContext ||
+                window.webkitAudioContext)();
         }
 
-        if (enemy.y > game.clientHeight) {
-            enemy.el.remove();
-            enemies.splice(i, 1);
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
 
-            score++;
-            scoreEl.textContent = score;
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
 
-            if (score % 10 === 0) {
-                speed += 15;
-            }
+        let frequency = 400;
+        let duration = .08;
+
+        if(type === "coin"){
+            frequency = 900;
+            duration = .1;
         }
-    }
 
-    animation = requestAnimationFrame(gameLoop);
+        if(type === "hit"){
+            frequency = 100;
+            duration = .2;
+        }
+
+        if(type === "power"){
+            frequency = 650;
+            duration = .18;
+        }
+
+        if(type === "level"){
+            frequency = 1100;
+            duration = .25;
+        }
+
+        osc.frequency.value = frequency;
+        osc.type = "sine";
+
+        gain.gain.setValueAtTime(.08,audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(
+            .001,
+            audioCtx.currentTime + duration
+        );
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+
+    }catch(e){}
 }
+
+
+/* =========================
+   INPUT
+========================= */
 
 const keys = {
-    left: false,
-    right: false
+    left:false,
+    right:false
 };
 
-document.addEventListener("keydown", e => {
-    if (e.key === "ArrowLeft" || e.key.toLowerCase() === "a") {
+document.addEventListener("keydown",e=>{
+
+    if(e.key === "ArrowLeft" || e.key.toLowerCase()==="a"){
         keys.left = true;
     }
 
-    if (e.key === "ArrowRight" || e.key.toLowerCase() === "d") {
+    if(e.key === "ArrowRight" || e.key.toLowerCase()==="d"){
         keys.right = true;
     }
 
-    if (e.key === " " && !running) {
-        startGame();
+    if(e.key === " "){
+        e.preventDefault();
+
+        if(running){
+            togglePause();
+        }
     }
 });
 
-document.addEventListener("keyup", e => {
-    if (e.key === "ArrowLeft" || e.key.toLowerCase() === "a") {
+document.addEventListener("keyup",e=>{
+
+    if(e.key === "ArrowLeft" || e.key.toLowerCase()==="a"){
         keys.left = false;
     }
 
-    if (e.key === "ArrowRight" || e.key.toLowerCase() === "d") {
+    if(e.key === "ArrowRight" || e.key.toLowerCase()==="d"){
         keys.right = false;
     }
 });
 
-// Mobile controls
-function holdButton(button, direction) {
-    const start = e => {
+
+function holdButton(button,direction){
+
+    const down=e=>{
         e.preventDefault();
-        keys[direction] = true;
+        keys[direction]=true;
     };
 
-    const stop = e => {
+    const up=e=>{
         e.preventDefault();
-        keys[direction] = false;
+        keys[direction]=false;
     };
 
-    button.addEventListener("pointerdown", start);
-    button.addEventListener("pointerup", stop);
-    button.addEventListener("pointerleave", stop);
-    button.addEventListener("pointercancel", stop);
+    button.addEventListener("pointerdown",down);
+    button.addEventListener("pointerup",up);
+    button.addEventListener("pointerleave",up);
+    button.addEventListener("pointercancel",up);
 }
 
-holdButton(document.getElementById("leftBtn"), "left");
-holdButton(document.getElementById("rightBtn"), "right");
+holdButton(document.getElementById("leftBtn"),"left");
+holdButton(document.getElementById("rightBtn"),"right");
 
-startBtn.onclick = startGame;
+
+/* =========================
+   START / RESET
+========================= */
+
+function resetGame(){
+
+    [...enemies,...coinObjects,...powerObjects].forEach(o=>{
+        o.el.remove();
+    });
+
+    enemies=[];
+    coinObjects=[];
+    powerObjects=[];
+    particles=[];
+
+    score=0;
+    coins=0;
+    lives=3;
+    level=1;
+    combo=1;
+
+    speed=180;
+
+    enemyTimer=0;
+    coinTimer=0;
+    powerTimer=0;
+
+    shield=false;
+    slowTime=0;
+    invincibleTime=0;
+
+    player.className="";
+
+    playerX=(game.clientWidth-player.offsetWidth)/2;
+
+    player.style.left=playerX+"px";
+
+    updateHUD();
+}
+
+
+function startGame(){
+
+    resetGame();
+
+    overlay.style.display="none";
+
+    running=true;
+    paused=false;
+
+    pauseBtn.textContent="Ⅱ";
+
+    lastTime=performance.now();
+
+    sound("level");
+
+    animation=requestAnimationFrame(gameLoop);
+}
+
+
+/* =========================
+   GAME OVER
+========================= */
+
+function endGame(){
+
+    running=false;
+
+    cancelAnimationFrame(animation);
+
+    if(score>best){
+        best=score;
+        localStorage.setItem("dodgeBest",best);
+    }
+
+    bestEl.textContent=best;
+
+    overlay.innerHTML=`
+        <h2>💥 Game Over</h2>
+
+        <p>
+            Score: <strong>${score}</strong><br>
+            Coins: <strong>${coins}</strong><br>
+            Level: <strong>${level}</strong><br>
+            Best: <strong>${best}</strong>
+        </p>
+
+        <button id="restart">Play Again</button>
+    `;
+
+    overlay.style.display="flex";
+
+    document.getElementById("restart").onclick=startGame;
+
+    sound("hit");
+}
+
+
+/* =========================
+   PAUSE
+========================= */
+
+function togglePause(){
+
+    if(!running) return;
+
+    paused=!paused;
+
+    if(paused){
+
+        pauseBtn.textContent="▶";
+
+        overlay.innerHTML=`
+            <h2>⏸ Paused</h2>
+            <p>Take a breath. Your game is waiting.</p>
+            <button id="resume">Resume</button>
+        `;
+
+        overlay.style.display="flex";
+
+        document.getElementById("resume").onclick=togglePause;
+
+    }else{
+
+        overlay.style.display="none";
+        pauseBtn.textContent="Ⅱ";
+
+        lastTime=performance.now();
+
+        animation=requestAnimationFrame(gameLoop);
+    }
+}
+
+pauseBtn.onclick=togglePause;
+
+
+/* =========================
+   SPAWN ENEMY
+========================= */
+
+function spawnEnemy(){
+
+    const el=document.createElement("div");
+
+    let type=Math.random();
+
+    if(type<.16){
+        el.className="enemy big";
+    }else if(type<.38){
+        el.className="enemy fast";
+    }else{
+        el.className="enemy";
+    }
+
+    const width=el.classList.contains("big") ? 52 : 38;
+
+    const x=Math.random()*(game.clientWidth-width);
+
+    el.style.left=x+"px";
+    el.style.top="-60px";
+
+    game.appendChild(el);
+
+    let enemySpeed=speed+Math.random()*110;
+
+    if(el.classList.contains("fast")){
+        enemySpeed*=1.45;
+    }
+
+    if(el.classList.contains("big")){
+        enemySpeed*=.7;
+    }
+
+    enemies.push({
+        el,
+        x,
+        y:-60,
+        width,
+        height:width,
+        speed:enemySpeed
+    });
+}
+
+
+/* =========================
+   SPAWN COIN
+========================= */
+
+function spawnCoin(){
+
+    const el=document.createElement("div");
+
+    el.className="coin";
+    el.textContent="";
+
+    const x=Math.random()*(game.clientWidth-25);
+
+    el.style.left=x+"px";
+    el.style.top="-30px";
+
+    game.appendChild(el);
+
+    coinObjects.push({
+        el,
+        x,
+        y:-30,
+        speed:130+Math.random()*70
+    });
+}
+
+
+/* =========================
+   POWER UPS
+========================= */
+
+function spawnPower(){
+
+    const el=document.createElement("div");
+
+    const random=Math.random();
+
+    let type;
+
+    if(random<.4){
+        type="shield";
+        el.textContent="🛡️";
+    }else if(random<.75){
+        type="slow";
+        el.textContent="⏱️";
+    }else{
+        type="life";
+        el.textContent="❤️";
+    }
+
+    el.className="power "+type;
+
+    const x=Math.random()*(game.clientWidth-30);
+
+    el.style.left=x+"px";
+    el.style.top="-40px";
+
+    game.appendChild(el);
+
+    powerObjects.push({
+        el,
+        x,
+        y:-40,
+        type,
+        speed:120
+    });
+}
+
+
+/* =========================
+   COLLISION
+========================= */
+
+function collision(a,b){
+
+    return (
+        a.x < b.x+b.width &&
+        a.x+a.width > b.x &&
+        a.y < b.y+b.height &&
+        a.y+a.height > b.y
+    );
+}
+
+
+/* =========================
+   PARTICLES
+========================= */
+
+function explode(x,y,color="#5ee7ff"){
+
+    for(let i=0;i<14;i++){
+
+        const el=document.createElement("div");
+
+        el.className="particle";
+        el.style.background=color;
+
+        el.style.left=x+"px";
+        el.style.top=y+"px";
+
+        game.appendChild(el);
+
+        const angle=Math.random()*Math.PI*2;
+        const velocity=50+Math.random()*120;
+
+        particles.push({
+            el,
+            x,
+            y,
+            vx:Math.cos(angle)*velocity,
+            vy:Math.sin(angle)*velocity,
+            life:1
+        });
+    }
+}
+
+
+/* =========================
+   POWER EFFECTS
+========================= */
+
+function collectPower(power){
+
+    sound("power");
+
+    if(power.type==="shield"){
+
+        shield=true;
+        player.classList.add("shield");
+
+        setTimeout(()=>{
+            shield=false;
+            player.classList.remove("shield");
+        },6000);
+    }
+
+    if(power.type==="slow"){
+
+        slowTime=6;
+    }
+
+    if(power.type==="life"){
+
+        lives=Math.min(5,lives+1);
+    }
+
+    explode(power.x,power.y,"#ffffff");
+
+    updateHUD();
+}
+
+
+/* =========================
+   LEVEL SYSTEM
+========================= */
+
+function checkLevel(){
+
+    const newLevel=Math.floor(score/20)+1;
+
+    if(newLevel>level){
+
+        level=newLevel;
+
+        speed+=25;
+
+        combo=1;
+
+        sound("level");
+
+        explode(
+            game.clientWidth/2,
+            game.clientHeight/2,
+            "#8f7cff"
+        );
+    }
+}
+
+
+/* =========================
+   HUD
+========================= */
+
+function updateHUD(){
+
+    scoreEl.textContent=score;
+    levelEl.textContent=level;
+    livesEl.textContent=lives;
+    coinsEl.textContent=coins;
+    comboEl.textContent="x"+combo;
+    bestEl.textContent=best;
+}
+
+
+/* =========================
+   MAIN GAME LOOP
+========================= */
+
+function gameLoop(time){
+
+    if(!running || paused) return;
+
+    const delta=Math.min((time-lastTime)/1000,.04);
+
+    lastTime=time;
+
+    /* PLAYER */
+
+    const playerSpeed=340;
+
+    if(keys.left){
+        playerX-=playerSpeed*delta;
+    }
+
+    if(keys.right){
+        playerX+=playerSpeed*delta;
+    }
+
+    playerX=Math.max(
+        0,
+        Math.min(
+            game.clientWidth-player.offsetWidth,
+            playerX
+        )
+    );
+
+    player.style.left=playerX+"px";
+
+
+    /* TIMERS */
+
+    enemyTimer+=delta;
+    coinTimer+=delta;
+    powerTimer+=delta;
+
+    if(enemyTimer>Math.max(.25,.72-level*.035)){
+
+        spawnEnemy();
+        enemyTimer=0;
+    }
+
+    if(coinTimer>1.15){
+
+        spawnCoin();
+        coinTimer=0;
+    }
+
+    if(powerTimer>7+Math.random()*5){
+
+        spawnPower();
+        powerTimer=0;
+    }
+
+
+    /* SLOW POWER */
+
+    if(slowTime>0){
+
+        slowTime-=delta;
+
+        if(slowTime<0){
+            slowTime=0;
+        }
+    }
+
+    const timeMultiplier=slowTime>0 ? .45 : 1;
+
+
+    /* PLAYER RECT */
+
+    const playerRect={
+        x:playerX,
+        y:game.clientHeight-25-player.offsetHeight,
+        width:player.offsetWidth,
+        height:player.offsetHeight
+    };
+
+
+    /* ENEMIES */
+
+    for(let i=enemies.length-1;i>=0;i--){
+
+        const enemy=enemies[i];
+
+        enemy.y+=enemy.speed*delta*timeMultiplier;
+
+        enemy.el.style.top=enemy.y+"px";
+
+        const enemyRect={
+            x:enemy.x,
+            y:enemy.y,
+            width:enemy.width,
+            height:enemy.height
+        };
+
+
+        if(
+            collision(playerRect,enemyRect) &&
+            invincibleTime<=0
+        ){
+
+            if(shield){
+
+                shield=false;
+
+                player.classList.remove("shield");
+
+                explode(enemy.x,enemy.y,"#35ddff");
+
+                enemy.el.remove();
+                enemies.splice(i,1);
+
+                score+=3;
+
+                sound("power");
+
+                continue;
+            }
+
+            lives--;
+
+            invincibleTime=1.3;
+
+            player.classList.add("invincible");
+
+            explode(playerX,playerRect.y,"#ff405d");
+
+            enemy.el.remove();
+            enemies.splice(i,1);
+
+            combo=1;
+
+            sound("hit");
+
+            updateHUD();
+
+            if(lives<=0){
+
+                endGame();
+                return;
+            }
+
+            continue;
+        }
+
+
+        if(enemy.y>game.clientHeight+70){
+
+            enemy.el.remove();
+            enemies.splice(i,1);
+
+            score+=1+combo;
+
+            combo=Math.min(10,combo+1);
+
+            updateHUD();
+
+            checkLevel();
+        }
+    }
+
+
+    /* COINS */
+
+    for(let i=coinObjects.length-1;i>=0;i--){
+
+        const coin=coinObjects[i];
+
+        coin.y+=coin.speed*delta*timeMultiplier;
+
+        coin.el.style.top=coin.y+"px";
+
+        const rect={
+            x:coin.x,
+            y:coin.y,
+            width:25,
+            height:25
+        };
+
+        if(collision(playerRect,rect)){
+
+            coins++;
+
+            score+=5*combo;
+
+            combo=Math.min(10,combo+1);
+
+            explode(coin.x,coin.y,"#ffd633");
+
+            coin.el.remove();
+            coinObjects.splice(i,1);
+
+            sound("coin");
+
+            updateHUD();
+
+            checkLevel();
+
+            continue;
+        }
+
+        if(coin.y>game.clientHeight+40){
+
+            coin.el.remove();
+            coinObjects.splice(i,1);
+
+            combo=1;
+        }
+    }
+
+
+    /* POWER UPS */
+
+    for(let i=powerObjects.length-1;i>=0;i--){
+
+        const power=powerObjects[i];
+
+        power.y+=power.speed*delta*timeMultiplier;
+
+        power.el.style.top=power.y+"px";
+
+        const rect={
+            x:power.x,
+            y:power.y,
+            width:30,
+            height:30
+        };
+
+        if(collision(playerRect,rect)){
+
+            collectPower(power);
+
+            power.el.remove();
+            powerObjects.splice(i,1);
+
+            continue;
+        }
+
+        if(power.y>game.clientHeight+50){
+
+            power.el.remove();
+            powerObjects.splice(i,1);
+        }
+    }
+
+
+    /* INVINCIBILITY */
+
+    if(invincibleTime>0){
+
+        invincibleTime-=delta;
+
+        if(invincibleTime<=0){
+
+            invincibleTime=0;
+            player.classList.remove("invincible");
+        }
+    }
+
+
+    /* PARTICLES */
+
+    for(let i=particles.length-1;i>=0;i--){
+
+        const p=particles[i];
+
+        p.x+=p.vx*delta;
+        p.y+=p.vy*delta;
+
+        p.vy+=80*delta;
+
+        p.life-=delta*2;
+
+        p.el.style.left=p.x+"px";
+        p.el.style.top=p.y+"px";
+        p.el.style.opacity=Math.max(0,p.life);
+
+        if(p.life<=0){
+
+            p.el.remove();
+            particles.splice(i,1);
+        }
+    }
+
+
+    updateHUD();
+
+    animation=requestAnimationFrame(gameLoop);
+}
+
+
+/* =========================
+   START BUTTON
+========================= */
+
+startBtn.onclick=startGame;
+
 </script>
 
 </body>
