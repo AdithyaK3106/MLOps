@@ -1,0 +1,19 @@
+name: Check My Game
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get my code
+        uses: actions/checkout@v4
+
+      - name: Check that game exists
+        run: test -f index.html
+
+      - name: Show success
+        run: echo " Game file looks good!"
